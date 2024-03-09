@@ -46,8 +46,8 @@ contract RapBattle {
             oneShotNft.transferFrom(msg.sender, address(this), _tokenId);
             credToken.transferFrom(msg.sender, address(this), _credBet);
         } else {
-            // credToken.transferFrom(msg.sender, address(this), _credBet);
-            _battle(_tokenId, _credBet);
+            // credToken.transferFrom(msg.sender, address(this), _credBet);  // @audit The second User doesnt transfer the NFT and the Cred Token > Free Risk?
+            _battle(_tokenId, _credBet); // @audit the same user can set a battle with 2 NFTs
         }
     }
 
@@ -59,13 +59,15 @@ contract RapBattle {
         uint256 totalBattleSkill = defenderRapperSkill + challengerRapperSkill;
         uint256 totalPrize = defenderBet + _credBet;
 
+        // @audit random value can be calculated
         uint256 random =
             uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) % totalBattleSkill;
 
         // Reset the defender
         defender = address(0);
-        emit Battle(msg.sender, _tokenId, random < defenderRapperSkill ? _defender : msg.sender);
-
+        emit Battle(msg.sender, _tokenId, random < defenderRapperSkill ? _defender : msg.sender); // @audit if the random=defenderRapperSkills, the event will return the challenger as the winner
+        
+        // @audit battlesWon never updates
         // If random <= defenderRapperSkill -> defenderRapperSkill wins, otherwise they lose
         if (random <= defenderRapperSkill) {
             // We give them the money the defender deposited, and the challenger's bet

@@ -29,13 +29,14 @@ contract Streets is IERC721Receiver {
 
     // Stake tokens by transferring them to this contract
     function stake(uint256 tokenId) external {
-        stakes[tokenId] = Stake(block.timestamp, msg.sender);
+        stakes[tokenId] = Stake(block.timestamp, msg.sender);  // @audit Doesnt verify if the NFT exists before storing in the mapping
         emit Staked(msg.sender, tokenId, block.timestamp);
-        oneShotContract.transferFrom(msg.sender, address(this), tokenId);
+        oneShotContract.transferFrom(msg.sender, address(this), tokenId);  // @audit check if there's any error if it fails 
     }
 
     // Unstake tokens by transferring them back to their owner
     function unstake(uint256 tokenId) external {
+
         require(stakes[tokenId].owner == msg.sender, "Not the token owner");
         uint256 stakedDuration = block.timestamp - stakes[tokenId].startTime;
         uint256 daysStaked = stakedDuration / 1 days;
@@ -49,7 +50,7 @@ contract Streets is IERC721Receiver {
         // Apply changes based on the days staked
         if (daysStaked >= 1) {
             stakedRapperStats.weakKnees = false;
-            credContract.mint(msg.sender, 1);
+            credContract.mint(msg.sender, 1); // @audit Gas Optimization: mint the total cred Tokens at the end
         }
         if (daysStaked >= 2) {
             stakedRapperStats.heavyArms = false;

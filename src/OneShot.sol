@@ -48,7 +48,7 @@ contract OneShot is IOneShot, ERC721URIStorage, Ownable {
         metadata.heavyArms = heavyArms;
         metadata.spaghettiSweater = spaghettiSweater;
         metadata.calmAndReady = calmAndReady;
-        metadata.battlesWon = battlesWon;
+        metadata.battlesWon = battlesWon;  // @audit sets a value, shouldnt just increase the value?
     }
 
     /*//////////////////////////////////////////////////////////////
