@@ -65,6 +65,6 @@ contract RapBattleTest is Test {
         vm.startPrank(challenger);
         rapBattle.goOnStageOrBattle(0, 3);
 
-        assert(cred.balanceOf( challenger) == 3);
+        assert(cred.balanceOf( challenger) == 30);
     }
 }

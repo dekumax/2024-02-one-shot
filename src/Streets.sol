@@ -29,9 +29,9 @@ contract Streets is IERC721Receiver {
 
     // Stake tokens by transferring them to this contract
     function stake(uint256 tokenId) external {
-        stakes[tokenId] = Stake(block.timestamp, msg.sender);  // @audit Doesnt verify if the NFT exists before storing in the mapping
+        stakes[tokenId] = Stake(block.timestamp, msg.sender);
         emit Staked(msg.sender, tokenId, block.timestamp);
-        oneShotContract.transferFrom(msg.sender, address(this), tokenId);  // @audit check if there's any error if it fails 
+        oneShotContract.transferFrom(msg.sender, address(this), tokenId);
     }
 
     // Unstake tokens by transferring them back to their owner
@@ -47,26 +47,32 @@ contract Streets is IERC721Receiver {
         emit Unstaked(msg.sender, tokenId, stakedDuration);
         delete stakes[tokenId]; // Clear staking info
 
+        uint256 amountToMint = 0;
         // Apply changes based on the days staked
         if (daysStaked >= 1) {
             stakedRapperStats.weakKnees = false;
-            credContract.mint(msg.sender, 1); // @audit Gas Optimization: mint the total cred Tokens at the end
+            amountToMint +=1;
+            // credContract.mint(msg.sender, 1); // @audit Gas Optimization: mint the total cred Tokens at the end
         }
         if (daysStaked >= 2) {
             stakedRapperStats.heavyArms = false;
-            credContract.mint(msg.sender, 1);
+            amountToMint +=1;
+            // credContract.mint(msg.sender, 1);
         }
         if (daysStaked >= 3) {
             stakedRapperStats.spaghettiSweater = false;
-            credContract.mint(msg.sender, 1);
+            amountToMint +=1;
+            // credContract.mint(msg.sender, 1);
         }
         if (daysStaked >= 4) {
             stakedRapperStats.calmAndReady = true;
-            credContract.mint(msg.sender, 1);
+            amountToMint +=1;
+            // credContract.mint(msg.sender, 1);
         }
 
         // Only call the update function if the token was staked for at least one day
         if (daysStaked >= 1) {
+            credContract.mint( msg.sender, amountToMint);
             oneShotContract.updateRapperStats(
                 tokenId,
                 stakedRapperStats.weakKnees,
