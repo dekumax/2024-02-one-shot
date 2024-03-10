@@ -22,6 +22,24 @@
                 }
             ```
 
+#Low: OneShot::RapperStats.battlesWon is never used in the game
+
+#Github Link:
+
+#Finding:
+    ##Summary:
+        The RapperStats.battlesWon attribute is not updated when the rapper wins the battle
+
+    ##Impact:
+        Since the RapperStats.battlesWon attribute is not updated, at certain point all rappers will be at same level skills
+
+    ##Tools:
+        -Foundry
+    
+    ##Recommendations:
+        -Either remove the attribute from the RapperStats struct or increase the attribute, every time the Rapper wins a battle
+
+        
 #Low: Mint token in Streets::unstake() for each If statement wastes gas
 
 #Github Link:

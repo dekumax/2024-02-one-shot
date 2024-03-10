@@ -65,6 +65,41 @@ contract RapBattleTest is Test {
         vm.startPrank(challenger);
         rapBattle.goOnStageOrBattle(0, 3);
 
-        assert(cred.balanceOf( challenger) == 30);
+        assert(cred.balanceOf( challenger) == 3);
+    }
+
+    function testBattlesWonNeverGetsUpdated() public{
+        
+        address bobAddr = makeAddr("Bob");
+        vm.startPrank(bobAddr);
+        oneShot.mintRapper();
+        oneShot.approve(address(streets), 0);
+        streets.stake(0);
+        vm.warp( block.timestamp + 100 days);
+        streets.unstake(0);
+        cred.approve(address(rapBattle), 3);
+        oneShot.approve(address(rapBattle), 0);
+        rapBattle.goOnStageOrBattle(0, 3);
+        vm.stopPrank();
+
+
+
+        vm.startPrank(user);
+        oneShot.mintRapper();
+        oneShot.approve(address(streets), 1);
+        streets.stake(1);
+        vm.warp( block.timestamp + 4 days);
+        streets.unstake(1);
+
+        uint balanceBeforeBattle = cred.balanceOf( user);
+        oneShot.approve(address(rapBattle), 1);
+        cred.approve(address(rapBattle), 3);
+        rapBattle.goOnStageOrBattle(1, 3);
+        vm.stopPrank();
+        
+        
+        stats = oneShot.getRapperStats(1);
+        assert(cred.balanceOf( user) == balanceBeforeBattle + 3);
+        assert(stats.battlesWon == 0);
     }
 }
